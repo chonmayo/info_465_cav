@@ -8,21 +8,27 @@ import db_conn as db
 x = input("Enter coordinates for organ delivery\nx: ")
 y = input("y: ")
 #could be optional if you make a default constructor
-name = input("Enter name of hospital: ")
-blood_type = input("Enter recipient information\nBlood type: ")
+name = '\'{str}\''.format(str=input("Enter name of hospital: "))
+blood_type = '\'{str}\''.format(str=input("Enter recipient information\nBlood type: "))
 organ = input("Enter organ type: ")
 age = input("Enter recipient age: ")
 
+#Organ life lookup
+organ_hours = {
+    'heart':16,
+    'lung':8
+}
+
+organ_life = organ_hours[organ_t.lower()]
+
 recipient = request.Location(x,y,name)
-#recipient = request.Location(-118.257363, 34.076763, "4326", "Echo Park Ave & W Sunset Blvd, Los Angeles, California, 90026")
 locations = []
 locations.append(recipient)
-#reverse routing fromfacilitytoevent
 #the accident
 incidents = (request.craft_json(locations))
 locations.clear()
-#the hospital objects fetched from the database
-locations = db.Read('\'Heart\'','\'B\'',48)
+#the Location objects fetched from the V2X db
+locations = db.Read(name,blood_type,age)
 facilities = (request.craft_json(locations))
 response = request.send_post(incidents, facilities)
 

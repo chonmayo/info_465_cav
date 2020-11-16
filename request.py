@@ -1,5 +1,6 @@
 import json as j
 import requests
+import config
 
 class Location:
     def __init__(self,x,y,name):
@@ -30,23 +31,24 @@ def craft_json(locations):
     return json
 
 #you can use synchronous execution mode
-#travelMode
-#defaultCutoff - can cut off trip if it exceeds organ life
 #barriertype allows you to set polygonal barriers
 #defaultTargetFacilityRoute could be used in the future to calculate contingent routes
-#travelDirection:esriNATravelDirectionFromFacility
-#a location for where the organ is needed
-#attributeParameterValues ['attributeName':'Driving an Emergency Vehicle', 'parameterName':'Restriction Usage', 'value':'Prohibited']
-def send_post(incidents, facilities):
-    token = "gixB1j9_B1nrzJaeg1p2Tn7-1SadhP_TsZ7BPevU6dkDzlXRmeET34QiyIyEvrruPfd75EIsOXFJbPxkVrIkmtREp39pkxnTAeDwGkSyWWdI1ORbbj5XzTkmO778bgdZOo1EFUm6ngA3GXgV_pIDLA.."
+def send_post(incidents, facilities, organ_life_hours):
     url = "https://route.arcgis.com/arcgis/rest/services/World/ClosestFacility/NAServer/ClosestFacility_World/solveClosestFacility"
 
     payload = {'f':'json', 
-        'token':token, 
-        'returnDirections':'true',
-        'returnCFRoutes':'true',
-        'incidents':incidents,
-        'facilities':facilities,
+        'token':config.token, #access token
+        'returnDirections':'true', #return directions
+        'returnCFRoutes':'true', #return routes
+        'travelDirection':'esriNATravelDirectionFromFacility', #the route calculation begins from facilities
+        'defaultCutoff':organ_life_hours, #the organs maximum travel time
+        'incidents':incidents, #the location of the patient in need
+        'facilities':facilities, #the hospitals with organs matching patient needs
+        
+        'attributeParameterValues':{ #does not include routes with roadways that prohibit emergency vehicles
+            'attributeName':'Driving an Emergency Vehicle',
+            'parameterName':'Restriction Usage',
+            'value':'Prohibited'}
         }
 
     r = requests.post(url, data=payload)

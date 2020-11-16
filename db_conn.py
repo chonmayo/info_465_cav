@@ -1,16 +1,18 @@
 import pyodbc 
 import request
+import config
 
-
+#creates a connection to a db
 def Conn():
     conn = pyodbc.connect(
-        "Driver={SQL Server Native Client 11.0};"
-        "Server=DESKTOP-J5364RA;"
-        "Database=V2X;"
-        "Trusted_Connection=yes;"
+        "Driver={SQL Server Native Client 11.0};\
+        Server=config.server;\
+        Database=config.database;\
+        Trusted_Connection=yes;"
     )
     return conn
-#returns an array of locations from the database
+
+#reads an array of Locations from the database
 def Read(organ_class, bloodtype, age):
     conn = Conn()
     cursor = conn.cursor()
@@ -31,7 +33,7 @@ def Read(organ_class, bloodtype, age):
     conn.close()
     return locations
 
-
+#Create a record with a dictionary of attributes
 def Create(map, Table_t):
     conn = Conn()
     column_names = ""
@@ -51,6 +53,7 @@ def Create(map, Table_t):
     conn.commit()
     conn.close()
 
+#Delete a record from a table with a pkid
 def Delete(Object_id, table_t):
     conn = Conn()
     cursor = conn.cursor()
