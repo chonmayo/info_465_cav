@@ -41,7 +41,7 @@ def send_post(incidents, facilities, organ_life_hours):
         'returnDirections':'true', #return directions
         'returnCFRoutes':'true', #return routes
         'travelDirection':'esriNATravelDirectionFromFacility', #the route calculation begins from facilities
-        'defaultCutoff':organ_life_hours, #the organs maximum travel time
+        #'defaultCutoff':organ_life_hours, #the organs maximum travel time
         'incidents':incidents, #the location of the patient in need
         'facilities':facilities, #the hospitals with organs matching patient needs
         
@@ -52,4 +52,5 @@ def send_post(incidents, facilities, organ_life_hours):
         }
 
     r = requests.post(url, data=payload)
+    print(r.content)
     return r

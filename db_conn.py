@@ -5,10 +5,7 @@ import config
 #creates a connection to a db
 def Conn():
     conn = pyodbc.connect(
-        "Driver={SQL Server Native Client 11.0};\
-        Server=config.server;\
-        Database=config.database;\
-        Trusted_Connection=yes;"
+        "Driver={{SQL Server Native Client 11.0}};Server={sv};Database={db};Trusted_Connection=yes;".format(sv=config.server,db=config.db)
     )
     return conn
 

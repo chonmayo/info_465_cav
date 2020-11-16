@@ -7,16 +7,16 @@ Geometry is located in routes->features->geometry
 
 """
 
-def craft_request(geometry,envelope):
+def craft_request(geometry,envelope,best_point_geo):
   
   map_dict = {
       
       'mapOptions': {
       "extent": {
-        "xmin": envelope['xmin'],
-        "ymin": envelope['ymin'],
-        "xmax": envelope['xmax'],
-        "ymax": envelope['ymax'],
+        "xmin": envelope['xmin']-0.3,
+        "ymin": envelope['ymin']-0.3,
+        "xmax": envelope['xmax']+0.3,
+        "ymax": envelope['ymax']+0.3,
         "spatialReference": {
           "wkid": 4326
           }
@@ -29,13 +29,13 @@ def craft_request(geometry,envelope):
           "layers": [
             {
               "layerDefinition": {
-                "name": "pathLayer",
+                "name": "AmbLayer",
                 "geometryType": 'esriGeometryPolyline',
                 "drawingInfo": {
                   "renderer": {
                     "type": "simple",
                     "symbol": {
-                        "type" : "esriSLS",
+                        "type" :"esriSLS",
                         "style":"esriSLSDot",
                         "color":[0,0,0],
                         "width": "5"
@@ -47,6 +47,31 @@ def craft_request(geometry,envelope):
                 "features": [
                   {
                     "geometry":geometry,
+                    "spatialReference":{"wkid": 4326}
+                  }
+                ]
+              }
+            },
+            {
+              "layerDefinition": {
+                "name": "UAVLayer",
+                "geometryType":'esriGeometryPolyline',
+                "drawingInfo": {
+                  "renderer": {
+                    "type": "simple",
+                    "symbol": {
+                        "type" :"esriSLS",
+                        "style":"esriSLSSolid",
+                        "color":[255,0,0],
+                        "width": "5"
+                      }
+                    }
+                  }
+                },
+                "featureSet": {
+                "features": [
+                  {
+                    "geometry":best_point_geo,
                     "spatialReference":{"wkid": 4326}
                   }
                 ]
@@ -84,7 +109,7 @@ def craft_request(geometry,envelope):
     'Content-Type': 'application/x-www-form-urlencoded'
   }
   response = requests.request("POST", url, headers=headers, data = payload)
-  print(response.content)
+  print(response)
   #parse url from response and download the file
   response_dict = json.loads(response.content)
   url = response_dict['results'][0]['value']['url']

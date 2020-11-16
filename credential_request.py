@@ -1,5 +1,3 @@
-#this file holds sensitive information
-
 import requests
 import config
 
