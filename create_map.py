@@ -7,15 +7,19 @@ Geometry is located in routes->features->geometry
 
 """
 
-def craft_request(response):
+def craft_request(route,directions):
+  geometry_type = route['routes']['geometryType']
+  geometry = route['routes']['features'][0]['geometry']
+  envelope = directions['summary']['envelope']    
+  
   map_dict = {
       
       'mapOptions': {
       "extent": {
-        "xmin": -118.85360990096176,
-        "ymin": 33.99062491328014,
-        "xmax": -118.75318799544432,
-        "ymax": 34.04042561067984,
+        "xmin": envelope['xmin'],
+        "ymin": envelope['ymin'],
+        "xmax": envelope['xmax'],
+        "ymax": envelope['ymax'],
         "spatialReference": {
           "wkid": 4326
           }
@@ -28,30 +32,16 @@ def craft_request(response):
           "layers": [
             {
               "layerDefinition": {
-                "name": "pointLayer",
-                "geometryType": "esriGeometryPoint",
+                "name": "pathLayer",
+                "geometryType": geometry_type,
                 "drawingInfo": {
                   "renderer": {
                     "type": "simple",
                     "symbol": {
-                      "type": "esriSMS",
-                      "style": "esriSMSCircle",
-                      "color": [
-                        255,
-                        165,
-                        194,
-                        255
-                      ],
-                      "size": 50,
-                      "outline": {
-                        "color": [
-                          255,
-                          48,
-                          144,
-                          255
-                        ],
-                        "width": 3
-                        }
+                        "type" : "esriSLS",
+                        "style":"esriSLSDot",
+                        "color":[0,0,0],
+                        "width": "5"
                       }
                     }
                   }
@@ -59,13 +49,8 @@ def craft_request(response):
                 "featureSet": {
                 "features": [
                   {
-                    "geometry": {
-                      "x": -118.80619999999999,
-                      "y": 34.00167000000005,
-                      "spatialReference": {
-                        "wkid": 4326
-                      }
-                    }
+                    "geometry":geometry,
+                    "spatialReference":{"wkid": 4326}
                   }
                 ]
               }
@@ -102,5 +87,10 @@ def craft_request(response):
     'Content-Type': 'application/x-www-form-urlencoded'
   }
   response = requests.request("POST", url, headers=headers, data = payload)
+  #parse url from response and download the file
+  response_dict = json.loads(response.content)
+  url = response_dict['results'][0]['value']['url']
+  r = requests.get(url, allow_redirects=True)
+  open('map.png', 'wb').write(r.content)
 
   return(response)
