@@ -7,10 +7,7 @@ Geometry is located in routes->features->geometry
 
 """
 
-def craft_request(route,directions):
-  geometry_type = route['routes']['geometryType']
-  geometry = route['routes']['features'][0]['geometry']
-  envelope = directions['summary']['envelope']    
+def craft_request(geometry,envelope):
   
   map_dict = {
       
@@ -27,13 +24,13 @@ def craft_request(route,directions):
       },
     "operationalLayers": [
       {
-        "opacity":0.35,
+        "opacity":1,
         "featureCollection": {
           "layers": [
             {
               "layerDefinition": {
                 "name": "pathLayer",
-                "geometryType": geometry_type,
+                "geometryType": 'esriGeometryPolyline',
                 "drawingInfo": {
                   "renderer": {
                     "type": "simple",
@@ -87,6 +84,7 @@ def craft_request(route,directions):
     'Content-Type': 'application/x-www-form-urlencoded'
   }
   response = requests.request("POST", url, headers=headers, data = payload)
+  print(response.content)
   #parse url from response and download the file
   response_dict = json.loads(response.content)
   url = response_dict['results'][0]['value']['url']

@@ -11,14 +11,8 @@ def json_to_dict(response):
 
     return _dict
 
-def grep_route(_dict):
-    """
-    #mapoptions are returned in routes->features->directions->envelope
-    Geometry is located in routes->features->geometry
-    """
-    return _dict
 
-def grep_url(_dict):
+def grep_url(url):
     return url
 
 #if it is ever more efficient to use a drone at a point in the route, calculate distance to point

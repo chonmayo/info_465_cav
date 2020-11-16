@@ -1,6 +1,8 @@
 import request
 import create_map as cm
 import response_processing as rp
+import db_conn as db
+
 
 #ArcGIS supports GeoCoding for addresses
 x = input("Enter coordinates for organ delivery\nx: ")
@@ -11,7 +13,7 @@ blood_type = input("Enter recipient information\nBlood type: ")
 organ = input("Enter organ type: ")
 age = input("Enter recipient age: ")
 
-recipient = request.Location(x,y,"4326", name)
+recipient = request.Location(x,y,name)
 #recipient = request.Location(-118.257363, 34.076763, "4326", "Echo Park Ave & W Sunset Blvd, Los Angeles, California, 90026")
 locations = []
 locations.append(recipient)
@@ -20,22 +22,37 @@ locations.append(recipient)
 incidents = (request.craft_json(locations))
 locations.clear()
 #the hospital objects fetched from the database
-#locations.append(DB_VALUES)
-features = (request.craft_json(locations))
-response = request.send_post(incidents, features)
+locations = db.Read('\'Heart\'','\'B\'',48)
+facilities = (request.craft_json(locations))
+response = request.send_post(incidents, facilities)
 
 #convert json to a dict
-metadaddy = rp.json_to_dict(response.content)
+res_dict = rp.json_to_dict(response.content)
+"""
+#mapoptions are returned in routes->features->directions->envelope
+Geometry is located in routes->features->geometry
+"""
 
-#select the features we need from the dict
-metadaddy = rp.grep_route(metadaddy)
+route = res_dict['routes']['features'][0]['geometry']
+envelope = res_dict['directions'][0]['summary']['envelope']
 
 #send the route to create_map to change dict->json and send request
-response = cm.craft_request(metadaddy)
-metadaddy = rp.json_to_dict(response.content)
-
-#wget the url provided in the response
-#sys.exec("wget {url}".format(url=metadaddy['url']))
-#open the png file
-
+response = cm.craft_request(route,envelope)
 #DONE!!!!
+
+
+example_donor = {
+    'Donor_id':3,
+    'Donor_name':'\'LLoyd\'',
+    'Donor_age':48,
+    'Donor_blood_type':'\'B\''
+}
+
+example_organ = {
+    'Organ_id':3,
+    'Hospital_id':2,
+    'Donor_id':3,
+    'Organ_type':'\'Heart\'',
+    'Organ_life_hrs':16
+}
+
